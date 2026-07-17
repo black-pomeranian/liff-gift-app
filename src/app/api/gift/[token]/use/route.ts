@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyLineIdToken } from "@/lib/line-auth";
+import { isFriendOfOfficialAccount } from "@/lib/friendship";
 
 /**
  * ギフトカードを使用する。
@@ -17,6 +18,21 @@ export async function POST(
   }
 
   const { token } = await params;
+
+  // 公式アカウントを友だち追加していないユーザーは使用不可
+  let isFriend: boolean;
+  try {
+    isFriend = await isFriendOfOfficialAccount(user.userId);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "friendship_check_failed" },
+      { status: 500 }
+    );
+  }
+  if (!isFriend) {
+    return NextResponse.json({ error: "not_friend" }, { status: 403 });
+  }
 
   const result = await prisma.giftCard.updateMany({
     where: { token, status: "ACTIVE" },

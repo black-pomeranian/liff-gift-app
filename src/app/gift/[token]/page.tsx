@@ -14,7 +14,11 @@ type Card = {
   senderName: string;
   status: "ACTIVE" | "USED";
   usedAt: string | null;
+  /** 公式アカウントの友だちか（null = サーバー側で判定不能） */
+  isFriend: boolean | null;
 };
+
+const ADD_FRIEND_URL = process.env.NEXT_PUBLIC_OA_ADD_FRIEND_URL;
 
 export default function GiftPage() {
   const { token } = useParams<{ token: string }>();
@@ -86,6 +90,13 @@ export default function GiftPage() {
         setApiError("このカードはすでに使用されています。");
         return;
       }
+      if (res.status === 403) {
+        setCard({ ...card, isFriend: false });
+        setApiError(
+          "このカードを使用するには、公式アカウントの友だち追加が必要です。"
+        );
+        return;
+      }
       if (!res.ok) throw new Error(data.error ?? "使用処理に失敗しました");
       setCard(data.card);
       setJustUsed(true);
@@ -134,8 +145,35 @@ export default function GiftPage() {
             </p>
           ) : null}
 
+          {card.status === "ACTIVE" && card.isFriend === false ? (
+            <div className="notice">
+              このカードを使用するには、<b>公式アカウントの友だち追加</b>
+              が必要です。追加が終わったら「再読み込み」を押してください。
+            </div>
+          ) : null}
+
           <div className="btn-row">
-            {card.status === "ACTIVE" ? (
+            {card.status === "ACTIVE" && card.isFriend === false ? (
+              <>
+                {ADD_FRIEND_URL ? (
+                  <a
+                    className="btn btn-primary"
+                    href={ADD_FRIEND_URL}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    公式アカウントを友だち追加する
+                  </a>
+                ) : null}
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => window.location.reload()}
+                >
+                  再読み込み
+                </button>
+              </>
+            ) : null}
+            {card.status === "ACTIVE" && card.isFriend !== false ? (
               <button
                 className="btn btn-primary"
                 disabled={using}

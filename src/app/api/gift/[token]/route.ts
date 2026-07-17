@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyLineIdToken } from "@/lib/line-auth";
+import { isFriendOfOfficialAccount } from "@/lib/friendship";
 
 /** ギフトカードの内容を取得（受け取り側の表示用） */
 export async function GET(
@@ -18,6 +19,14 @@ export async function GET(
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
 
+  // 表示用に友だち状態も返す（判定できない場合は null = 不明。強制は使用 API 側で行う）
+  let isFriend: boolean | null = null;
+  try {
+    isFriend = await isFriendOfOfficialAccount(user.userId);
+  } catch (e) {
+    console.error(e);
+  }
+
   return NextResponse.json({
     card: {
       token: card.token,
@@ -26,6 +35,7 @@ export async function GET(
       senderName: card.senderName,
       status: card.status,
       usedAt: card.usedAt,
+      isFriend,
     },
   });
 }

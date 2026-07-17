@@ -103,6 +103,15 @@ npm run richmenu:setup
 - 使用処理は `updateMany({ where: { token, status: "ACTIVE" } })` による条件付き更新のため、同時に複数回押されても 1 回しか成功しません
 - 使用済みカードを開くと「使用済み」オーバーレイが表示されます
 
+### 友だち追加の義務付け
+
+カードの使用には**公式アカウント（Messaging API チャネル）の友だち追加が必須**です。
+
+- サーバー側で Messaging API のプロフィール取得（友だちでなければ 404 が返る）を使って判定し、未友だちの使用リクエストは 403 で拒否します
+- 受け取り画面では未友だちの場合に「友だち追加する」ボタン（`NEXT_PUBLIC_OA_ADD_FRIEND_URL`）と再読み込みボタンを表示します
+- この判定が機能する前提として、**ミニアプリ（LINEログイン）チャネルと Messaging API チャネルが同じプロバイダー配下**である必要があります（userId が共通になるため）。また `LINE_MESSAGING_CHANNEL_ACCESS_TOKEN` の設定が必須です
+- 制限: 一度友だち追加した後にブロックしたユーザーは、Messaging API の仕様上「友だち」と判定される場合があります
+
 ## API
 
 | メソッド / パス | 説明 |
@@ -110,7 +119,7 @@ npm run richmenu:setup
 | `POST /api/cards` | カード作成（要 ID トークン） |
 | `GET /api/cards` | 自分が作成したカード一覧 |
 | `GET /api/gift/[token]` | カード内容の取得 |
-| `POST /api/gift/[token]/use` | カードの使用（使用済みなら 409） |
+| `POST /api/gift/[token]/use` | カードの使用（使用済みなら 409、公式アカウント未友だちなら 403） |
 
 すべての API は `Authorization: Bearer <LIFF の ID トークン>` を必須とし、
 サーバー側で LINE の [verify エンドポイント](https://developers.line.biz/ja/reference/line-login/#verify-id-token)により検証します。
