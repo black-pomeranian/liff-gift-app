@@ -1,0 +1,327 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --line-green: #06c755;
+  --line-green-dark: #05a847;
+  --bg: #f5f6f8;
+  --card-bg: #ffffff;
+  --text: #1f2328;
+  --text-sub: #6b7280;
+  --border: #e5e7eb;
+  --danger: #e5484d;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI",
+    "Meiryo", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+main.container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  min-height: 100dvh;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 8px 0 16px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-sub);
+  margin: 20px 0 8px;
+}
+
+/* --- buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--line-green);
+  color: #fff;
+}
+
+.btn-primary:not(:disabled):active {
+  background: var(--line-green-dark);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* --- gift card preview --- */
+.gift-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  border-radius: 16px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.gift-card .card-message {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 70%;
+  overflow: hidden;
+}
+
+.gift-card .card-sender {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 12px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.gift-card.is-used::after {
+  content: "使用済み";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+}
+
+/* --- template picker --- */
+.template-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.template-item {
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  position: relative;
+}
+
+.template-item img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 8 / 5;
+  object-fit: cover;
+}
+
+.template-item .template-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 4px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.35);
+  text-align: center;
+}
+
+.template-item.selected {
+  border-color: var(--line-green);
+}
+
+/* --- form --- */
+.textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 16px;
+  font-family: inherit;
+  resize: vertical;
+  background: #fff;
+}
+
+.textarea:focus {
+  outline: 2px solid var(--line-green);
+  border-color: transparent;
+}
+
+.char-count {
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-top: 4px;
+}
+
+/* --- list --- */
+.card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-list-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.card-list-item img {
+  width: 96px;
+  aspect-ratio: 8 / 5;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.card-list-item .card-list-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-list-item .card-list-message {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-list-item .card-list-date {
+  font-size: 12px;
+  color: var(--text-sub);
+  margin-top: 4px;
+}
+
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 6px;
+}
+
+.badge-active {
+  background: #e6f9ee;
+  color: var(--line-green-dark);
+}
+
+.badge-used {
+  background: #f1f2f4;
+  color: var(--text-sub);
+}
+
+/* --- misc --- */
+.profile-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 20px;
+}
+
+.profile-row img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+}
+
+.profile-row .profile-name {
+  font-weight: 600;
+}
+
+.notice {
+  background: #fff7e6;
+  border: 1px solid #f5d488;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 12px 0;
+}
+
+.error-box {
+  background: #fdecec;
+  border: 1px solid #f3b1b3;
+  color: var(--danger);
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 13px;
+  margin: 12px 0;
+}
+
+.center {
+  text-align: center;
+}
+
+.loading {
+  padding: 48px 0;
+  text-align: center;
+  color: var(--text-sub);
+}
+
+.result-message {
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 16px 0;
+  text-align: center;
+}

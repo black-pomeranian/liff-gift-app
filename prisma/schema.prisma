@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model GiftCard {
+  id         String    @id @default(cuid())
+  token      String    @unique @default(uuid())
+  senderId   String
+  senderName String
+  templateId String
+  message    String
+  status     String    @default("ACTIVE") // ACTIVE | USED
+  usedById   String?
+  usedByName String?
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([senderId])
+}
