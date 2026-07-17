@@ -23,7 +23,7 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
   });
 }
 
-/** ギフトカードの共有用 URL（LIFF URL 形式なので LINE 内で開くとログイン済みで遷移できる） */
+/** ギフトカードの共有用 URL（ミニアプリのパーマネントリンク。LINE 内で開くとログイン済みで遷移できる） */
 export function giftUrl(token: string): string {
-  return `https://liff.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/gift/${token}`;
+  return `https://miniapp.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/gift/${token}`;
 }

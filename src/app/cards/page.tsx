@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useLiff } from "@/components/LiffProvider";
 import { apiFetch, giftUrl } from "@/lib/api-client";
+import { shareGiftCard } from "@/lib/share";
 import { getTemplate } from "@/lib/templates";
 
 type Card = {
@@ -11,6 +12,7 @@ type Card = {
   token: string;
   templateId: string;
   message: string;
+  senderName: string;
   status: "ACTIVE" | "USED";
   usedByName: string | null;
   usedAt: string | null;
@@ -69,6 +71,21 @@ export default function CardsPage() {
     setTimeout(() => setCopiedToken(null), 2000);
   };
 
+  const share = async (card: Card) => {
+    setApiError(null);
+    try {
+      await shareGiftCard({
+        token: card.token,
+        message: card.message,
+        senderName: card.senderName,
+      });
+    } catch {
+      setApiError(
+        "送信画面を開けませんでした。コンソールの「ウェブアプリ設定」でシェアターゲットピッカーが有効か確認してください。"
+      );
+    }
+  };
+
   return (
     <main className="container">
       <h1 className="page-title">送ったカード</h1>
@@ -105,6 +122,13 @@ export default function CardsPage() {
                   ) : (
                     <>
                       <span className="badge badge-active">未使用</span>{" "}
+                      <button
+                        className="badge badge-active"
+                        style={{ border: "none", cursor: "pointer" }}
+                        onClick={() => share(card)}
+                      >
+                        LINE で送る
+                      </button>{" "}
                       <button
                         className="badge badge-active"
                         style={{ border: "none", cursor: "pointer" }}

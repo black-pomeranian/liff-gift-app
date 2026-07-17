@@ -31,7 +31,8 @@ if (!LIFF_ID) {
   process.exit(1);
 }
 
-const liffUrl = (p: string) => `https://liff.line.me/${LIFF_ID}${p}`;
+// ミニアプリのパーマネントリンク形式。タップするとミニアプリの各ページが開く
+const liffUrl = (p: string) => `https://miniapp.line.me/${LIFF_ID}${p}`;
 
 const richMenu = {
   size: { width: WIDTH, height: HEIGHT },

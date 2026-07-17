@@ -1,11 +1,11 @@
 "use client";
 
-import liff from "@line/liff";
 import Link from "next/link";
 import { useState } from "react";
 import { useLiff } from "@/components/LiffProvider";
 import { GiftCardView } from "@/components/GiftCardView";
 import { apiFetch, giftUrl } from "@/lib/api-client";
+import { shareGiftCard } from "@/lib/share";
 import { CARD_TEMPLATES, MAX_MESSAGE_LENGTH } from "@/lib/templates";
 
 type CreatedCard = { token: string; templateId: string; message: string };
@@ -18,6 +18,7 @@ export default function NewCardPage() {
   const [apiError, setApiError] = useState<string | null>(null);
   const [created, setCreated] = useState<CreatedCard | null>(null);
   const [copied, setCopied] = useState(false);
+  const [shareStatus, setShareStatus] = useState<string | null>(null);
 
   if (error) {
     return (
@@ -67,41 +68,19 @@ export default function NewCardPage() {
   };
 
   const handleShare = async (card: CreatedCard) => {
-    const url = giftUrl(card.token);
-    if (liff.isApiAvailable("shareTargetPicker")) {
-      await liff.shareTargetPicker([
-        {
-          type: "flex",
-          altText: `${profile?.displayName ?? ""}さんからギフトカードが届きました🎁`,
-          contents: {
-            type: "bubble",
-            body: {
-              type: "box",
-              layout: "vertical",
-              spacing: "md",
-              contents: [
-                { type: "text", text: "🎁 ギフトカードが届きました", weight: "bold", size: "md", wrap: true },
-                { type: "text", text: `${profile?.displayName ?? ""}さんから`, size: "sm", color: "#6b7280" },
-                { type: "text", text: card.message, size: "sm", wrap: true },
-              ],
-            },
-            footer: {
-              type: "box",
-              layout: "vertical",
-              contents: [
-                {
-                  type: "button",
-                  style: "primary",
-                  color: "#06C755",
-                  action: { type: "uri", label: "カードを開く", uri: url },
-                },
-              ],
-            },
-          },
-        },
-      ]);
-    } else {
-      await copyUrl(card);
+    setShareStatus(null);
+    try {
+      const result = await shareGiftCard({
+        token: card.token,
+        message: card.message,
+        senderName: profile?.displayName ?? "",
+      });
+      if (result === "sent") setShareStatus("送信しました ✓");
+      if (result === "cancelled") setShareStatus("送信をキャンセルしました");
+    } catch {
+      setShareStatus(
+        "送信画面を開けませんでした。コンソールの「ウェブアプリ設定」でシェアターゲットピッカーが有効か確認してください。"
+      );
     }
   };
 
@@ -120,6 +99,7 @@ export default function NewCardPage() {
           message={created.message}
           senderName={profile?.displayName}
         />
+        {shareStatus ? <p className="result-message">{shareStatus}</p> : null}
         <div className="btn-row">
           <button className="btn btn-primary" onClick={() => handleShare(created)}>
             LINE の友だちに送る
