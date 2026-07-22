@@ -1,7 +1,7 @@
 "use client";
 
 import liff from "@line/liff";
-import { giftUrl } from "./api-client";
+import { giftUrl, giftImageUrl } from "./api-client";
 
 export type ShareResult = "sent" | "cancelled" | "fallback-line";
 
@@ -19,6 +19,9 @@ export async function shareGiftCard(card: {
   senderName: string;
 }): Promise<ShareResult> {
   const url = giftUrl(card.token);
+  const imageUrl = giftImageUrl(card.token);
+  // hero image は https の絶対 URL が必須（NEXT_PUBLIC_APP_URL 未設定時は付けない）
+  const hasThumbnail = imageUrl.startsWith("https://");
 
   if (liff.isApiAvailable("shareTargetPicker")) {
     const res = await liff.shareTargetPicker([
@@ -27,6 +30,17 @@ export async function shareGiftCard(card: {
         altText: `${card.senderName}さんからギフトカードが届きました🎁`,
         contents: {
           type: "bubble",
+          ...(hasThumbnail
+            ? {
+                hero: {
+                  type: "image" as const,
+                  url: imageUrl,
+                  size: "full" as const,
+                  aspectRatio: "1.91:1" as const,
+                  aspectMode: "cover" as const,
+                },
+              }
+            : {}),
           body: {
             type: "box",
             layout: "vertical",

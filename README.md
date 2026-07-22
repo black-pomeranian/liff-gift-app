@@ -112,6 +112,19 @@ npm run richmenu:setup
 - この判定が機能する前提として、**ミニアプリ（LINEログイン）チャネルと Messaging API チャネルが同じプロバイダー配下**である必要があります（userId が共通になるため）。また `LINE_MESSAGING_CHANNEL_ACCESS_TOKEN` の設定が必須です
 - 制限: 一度友だち追加した後にブロックしたユーザーは、Messaging API の仕様上「友だち」と判定される場合があります
 
+### OGP / シェア時のサムネイル画像
+
+ギフトの受け取りページ (`/gift/[token]`) には、カードの絵柄とメッセージを合成した画像が表示されます。
+
+- **shareTargetPicker で送信したとき**: Flex メッセージの hero image として表示されます（[share.ts](src/lib/share.ts)）
+- **URL をそのまま貼り付けたとき**: LINE や他のチャットアプリのリンクプレビュー（OGP）として表示されます（`generateMetadata` in [gift/[token]/page.tsx](src/app/gift/%5Btoken%5D/page.tsx)）
+
+画像自体は `GET /api/gift/[token]/image` で `next/og`（satori）を使い都度動的生成しています。日本語フォントは satori に内蔵されていないため、Google Fonts から Noto Sans JP のグリフをリクエスト時に取得しています（[og-font.ts](src/lib/og-font.ts)）。
+
+- 有効にするには `.env` に **`NEXT_PUBLIC_APP_URL`**（このアプリ自身の公開 URL。開発中は ngrok の固定ドメイン）の設定が必須です。未設定の場合、サムネイル/OGP は表示されませんが他の機能には影響しません
+- 画像生成サーバー（あなたの開発 PC + ngrok）が、リンクを開く/シェアする瞬間に到達可能である必要があります。ngrok を落とすとサムネイルも表示されなくなります
+- フォント取得のため、サーバーが `fonts.googleapis.com` に到達できるネットワーク環境が必要です
+
 ## API
 
 | メソッド / パス | 説明 |
@@ -120,6 +133,7 @@ npm run richmenu:setup
 | `GET /api/cards` | 自分が作成したカード一覧 |
 | `GET /api/gift/[token]` | カード内容の取得 |
 | `POST /api/gift/[token]/use` | カードの使用（使用済みなら 409、公式アカウント未友だちなら 403） |
+| `GET /api/gift/[token]/image` | カードの絵柄 + メッセージを合成した OGP/シェア用サムネイル画像（PNG、認証不要） |
 
 すべての API は `Authorization: Bearer <LIFF の ID トークン>` を必須とし、
 サーバー側で LINE の [verify エンドポイント](https://developers.line.biz/ja/reference/line-login/#verify-id-token)により検証します。

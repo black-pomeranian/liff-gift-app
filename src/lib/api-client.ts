@@ -27,3 +27,15 @@ export async function apiFetch(path: string, init?: RequestInit): Promise<Respon
 export function giftUrl(token: string): string {
   return `https://miniapp.line.me/${process.env.NEXT_PUBLIC_LIFF_ID}/gift/${token}`;
 }
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+
+/**
+ * OGP プレビュー・シェア時のサムネイルに使う画像 URL（自サーバーの動的生成 API）。
+ * NEXT_PUBLIC_APP_URL（自分の公開 URL）が未設定の場合は相対パスを返す。
+ */
+export function giftImageUrl(token: string): string {
+  return APP_URL
+    ? `${APP_URL}/api/gift/${token}/image`
+    : `/api/gift/${token}/image`;
+}
